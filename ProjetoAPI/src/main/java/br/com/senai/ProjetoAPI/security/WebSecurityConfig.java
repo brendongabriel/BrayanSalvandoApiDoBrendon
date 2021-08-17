@@ -25,42 +25,54 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String[] AUTH_LIST = {
             "/",
-            "/pessoas/cadastrar",
             "/pessoas/listar",
-            "/pessoas/{pessoaId}",
-            "/pessoas/role"
+            "/pessoas/buscar/{pessoaId}",
+            "/produtos/editar/{produtoId}",
+            "/produtos/deletar/{produtoId}"
+
+    };
+
+    private static final String[] LIST = {
+            "/authenticate",
+            "/pessoas/cadastrar",
+            "/produtos/listar",
+            "/produtos/cadastrar",
+            "/produtos/buscar/{produtoId}",
+            "/produtos/procurar/{produtoNome}",
+            "/produtos/procurar/containing/{nomeContaining}"
+
     };
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.GET, "/produtos").hasRole("ADMIN")
-                .antMatchers("/authenticate").permitAll()
-                .antMatchers(HttpMethod.GET,AUTH_LIST).permitAll()
-                .antMatchers(HttpMethod.POST,AUTH_LIST).permitAll()
-                .antMatchers(HttpMethod.PUT,AUTH_LIST).permitAll()
-                .antMatchers(HttpMethod.DELETE,AUTH_LIST).permitAll()
+                .antMatchers(HttpMethod.GET,AUTH_LIST).hasRole("ADMIN")
+                .antMatchers(HttpMethod.POST,AUTH_LIST).hasRole("ADMIN")
+                .antMatchers(HttpMethod.PUT,AUTH_LIST).hasRole("ADMIN")
+                .antMatchers(HttpMethod.DELETE,AUTH_LIST).hasRole("ADMIN")
+                .antMatchers(HttpMethod.GET, LIST).permitAll()
+                .antMatchers(HttpMethod.POST, LIST).permitAll()
                 .anyRequest().authenticated()
                 .and().cors()
                 .and().sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and().logout()
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 .deleteCookies("token").invalidateHttpSession(true);
+
         http.addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     @Override
     @Bean
-    public AuthenticationManager authenticationManagerBean() throws Exception{
+    public AuthenticationManager authenticationManagerBean() throws Exception {
         return super.authenticationManagerBean();
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(implementsUserDetailsService)
-                .passwordEncoder(new BCryptPasswordEncoder());
-
+        auth.userDetailsService(implementsUserDetailsService).passwordEncoder(
+                new BCryptPasswordEncoder());
     }
 
     @Override

@@ -9,6 +9,7 @@ import br.com.senai.ProjetoAPI.domain.model.Pessoa;
 import br.com.senai.ProjetoAPI.domain.model.Produto;
 import br.com.senai.ProjetoAPI.domain.model.RolePessoa;
 import br.com.senai.ProjetoAPI.domain.repository.PessoaReporitory;
+import br.com.senai.ProjetoAPI.domain.repository.RolePessoasRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -22,9 +23,14 @@ public class PessoaService {
     private PessoaAssembler pessoaAssembler;
     private PessoaReporitory pessoaReporitory;
     private RolePessoaService rolePessoaService;
+    private RolePessoasRepository rolePessoasRepository;
 
     @Transactional
     public Pessoa cadastrar(Pessoa pessoa) {
+        Pessoa pessoaExiste = pessoaReporitory.findByEmail(pessoa.getEmail());
+        if (pessoaExiste != null){
+            throw new ProgramaException("Esse email ja está cadastrado");
+        }
         Pessoa pessoa1 = pessoaReporitory.save(pessoa);
         RolePessoa rolePessoa = new RolePessoa();
         rolePessoa.setPessoa_codigo(pessoa.getCodigo());
@@ -47,12 +53,15 @@ public class PessoaService {
 
     public Pessoa buscar(Long produtoId){
         return pessoaReporitory.findById(produtoId)
-                .orElseThrow(() -> new ProgramaException("Produto não encontrado."));
+                .orElseThrow(() -> new ProgramaException("Pessoa não encontrada."));
     }
 
     public ResponseEntity<PessoaDTO> editar(Long pessoaId, Pessoa pessoa) {
         if (!pessoaReporitory.existsById(pessoaId)){
-            throw new ProgramaException("Produto não encontrado");
+            throw new ProgramaException("Pessoa não encontrada");
+        }
+        if (pessoaReporitory.findByEmail(pessoa.getEmail()) != null){
+            throw new ProgramaException("Esse email ja está cadastrado");
         }
         Pessoa pessoa1 = this.buscar(pessoaId);
         pessoa.setCodigo(pessoaId);
@@ -62,7 +71,7 @@ public class PessoaService {
 
     public Pessoa editarPerfilAdmin(Long pessoaId) {
         if (!pessoaReporitory.existsById(pessoaId)){
-            throw new ProgramaException("Produto não encontrado");
+            throw new ProgramaException("Pessoa não encontrada");
         }
         Pessoa pessoa1 = this.buscar(pessoaId);
         pessoa1.setCodigo(pessoaId);
@@ -71,6 +80,9 @@ public class PessoaService {
     }
 
     public void deletar(Long pessoaId) {
+        if (!pessoaReporitory.existsById(pessoaId)){
+            throw new ProgramaException("Pessoa não encontrada");
+        }
         pessoaReporitory.deleteById(pessoaId);
     }
 }

@@ -2,12 +2,8 @@ package br.com.senai.ProjetoAPI.api.controller;
 
 import br.com.senai.ProjetoAPI.api.assembler.PessoaAssembler;
 import br.com.senai.ProjetoAPI.api.model.PessoaDTO;
-import br.com.senai.ProjetoAPI.api.model.ProdutoDTO;
 import br.com.senai.ProjetoAPI.api.model.input.PessoaInputDTO;
-import br.com.senai.ProjetoAPI.api.model.input.ProdutoInputDTO;
-import br.com.senai.ProjetoAPI.domain.model.Perfil;
 import br.com.senai.ProjetoAPI.domain.model.Pessoa;
-import br.com.senai.ProjetoAPI.domain.model.Produto;
 import br.com.senai.ProjetoAPI.domain.repository.PessoaReporitory;
 import br.com.senai.ProjetoAPI.domain.service.PessoaService;
 import lombok.AllArgsConstructor;
@@ -49,6 +45,7 @@ public class PessoaController {
     public ResponseEntity<PessoaDTO> editar(@Valid @PathVariable Long pessoaId,
                                              @RequestBody PessoaInputDTO pessoaInputDTO){
         Pessoa pessoa = pessoaAssembler.toEntity(pessoaInputDTO);
+        pessoa.setSenha(new BCryptPasswordEncoder().encode(pessoaInputDTO.getSenha()));
         pessoaService.editar(pessoaId,pessoa);
         return ResponseEntity.ok(pessoaAssembler.toModel(pessoa));
     }

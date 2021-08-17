@@ -3,6 +3,7 @@ package br.com.senai.ProjetoAPI.api.controller;
 import br.com.senai.ProjetoAPI.api.assembler.ProdutoAssembler;
 import br.com.senai.ProjetoAPI.api.model.ProdutoDTO;
 import br.com.senai.ProjetoAPI.api.model.input.ProdutoInputDTO;
+import br.com.senai.ProjetoAPI.domain.exception.ProgramaException;
 import br.com.senai.ProjetoAPI.domain.model.Produto;
 import br.com.senai.ProjetoAPI.domain.service.ProdutoService;
 import lombok.AllArgsConstructor;
@@ -23,7 +24,6 @@ public class ProdutoController {
     @PostMapping("/cadastrar")
     public ProdutoDTO cadastrar(@RequestBody ProdutoInputDTO produtoInputDTO){
         Produto novoProduto = produtoAssembler.toEntity(produtoInputDTO);
-        novoProduto.setValorTotalEmEstoque(produtoInputDTO.getValorUnitario()*produtoInputDTO.getQuantidade());
         Produto produto = produtoService.cadastrar(novoProduto);
         return produtoAssembler.toModel(produto);
     }
@@ -39,6 +39,16 @@ public class ProdutoController {
     @GetMapping("/buscar/{produtoId}")
     public ResponseEntity<ProdutoDTO> buscarId(@PathVariable Long produtoId){
         return produtoService.buscarId(produtoId);
+    }
+
+    @GetMapping("procurar/{produtoNome}")
+    public List<ProdutoDTO> procurarNome(@PathVariable String produtoNome){
+        return produtoService.procurarNome(produtoNome);
+    }
+
+    @GetMapping("/procurar/containing/{nomeContaining}")
+    public List<ProdutoDTO> listarNomeContaining(@PathVariable String nomeContaining){
+        return produtoService.procurarContaining(nomeContaining);
     }
 
     @GetMapping("/listar")

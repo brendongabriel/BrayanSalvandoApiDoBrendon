@@ -34,6 +34,7 @@ public class Pessoa implements UserDetails {
     @Email
     private String email;
 
+    @Size(min = 6)
     private String senha;
 
     @ManyToMany

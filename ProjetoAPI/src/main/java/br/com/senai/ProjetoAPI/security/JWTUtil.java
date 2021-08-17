@@ -22,7 +22,6 @@ public class JWTUtil {
         return extractClaim(token, Claims::getExpiration);
     }
 
-
     public <T> T extractClaim(String token, Function<Claims, T> claimsResolver){
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
@@ -30,9 +29,7 @@ public class JWTUtil {
 
     private Claims extractAllClaims(String token){
         return Jwts.parser()
-                .setSigningKey(Auth.secret).
-                        parseClaimsJws(token)
-                .getBody();
+                .setSigningKey(Auth.secret).parseClaimsJws(token).getBody();
     }
 
     private Boolean isTokenExpired(String token){
@@ -45,9 +42,8 @@ public class JWTUtil {
     }
 
     private String createToken(Map<String, Object> claims, String subject){
-        return Jwts.builder().setClaims(claims).setSubject(subject)
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setIssuedAt(new Date(System.currentTimeMillis() + Auth.expiresIn))
+        return Jwts.builder().setClaims(claims).setSubject(subject).setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + Auth.expiresIn))
                 .signWith(SignatureAlgorithm.HS256, Auth.secret).compact();
     }
 

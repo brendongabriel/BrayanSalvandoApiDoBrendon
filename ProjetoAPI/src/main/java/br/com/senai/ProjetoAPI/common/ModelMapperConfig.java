@@ -1,4 +1,4 @@
-package br.com.senai.ProjetoAPI.api.common;
+package br.com.senai.ProjetoAPI.common;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

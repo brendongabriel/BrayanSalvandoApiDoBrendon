@@ -6,6 +6,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProdutoInputDTO {
+
     private String produto;
     private int quantidade;
     private float valorUnitario;

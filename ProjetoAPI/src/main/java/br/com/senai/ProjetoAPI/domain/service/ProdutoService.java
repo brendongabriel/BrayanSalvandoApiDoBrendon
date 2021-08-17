@@ -31,6 +31,7 @@ public class ProdutoService {
 
     @Transactional
     public Produto cadastrar(Produto produto) {
+        produto.setValorTotalEmEstoque(produto.getValorUnitario()*produto.getQuantidade());
         return produtoRepository.save(produto);
     }
 
@@ -39,7 +40,7 @@ public class ProdutoService {
                 .map(produto ->
                         ResponseEntity.ok(produtoAssembler.toModel(produto))
                 )
-                .orElseThrow(()->new ProgramaException("Pessoa não encontrada."));
+                .orElseThrow(()->new ProgramaException("Produto não encontrado."));
     }
 
     public Produto buscar(Long produtoId){
@@ -54,6 +55,24 @@ public class ProdutoService {
 
     @Transactional
     public void deletar(Long produtoId){
+        if (produtoRepository.findById(produtoId) != null){
+            throw new ProgramaException("Produto não encontrado");
+        }
         produtoRepository.deleteById(produtoId );
+    }
+
+    public List<ProdutoDTO> procurarNome(String produtoNome) {
+        if (produtoAssembler.toCollectionModel(produtoRepository.findByProduto(produtoNome)).size() == 0){
+            throw new ProgramaException("Não foi encontrado nenhum produto com esse nome");
+        }
+        return produtoAssembler.toCollectionModel(produtoRepository.findByProduto(produtoNome));
+
+    }
+
+    public List<ProdutoDTO> procurarContaining(String nomeContaining) {
+        if (produtoAssembler.toCollectionModel(produtoRepository.findByNomeContaining(nomeContaining)).size() == 0){
+            throw new ProgramaException("Não foi encontrado nenhum produto com esse nome");
+        }
+        return produtoAssembler.toCollectionModel(produtoRepository.findByNomeContaining(nomeContaining));
     }
 }
