@@ -55,7 +55,7 @@ public class ProdutoService {
 
     @Transactional
     public void deletar(Long produtoId){
-        if (produtoRepository.findById(produtoId) != null){
+        if (produtoRepository.findById(produtoId) == null){
             throw new ProgramaException("Produto não encontrado");
         }
         produtoRepository.deleteById(produtoId );
